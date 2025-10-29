@@ -1,0 +1,91 @@
+# ===================================
+# Node.js / React Clean .gitignore
+# Keeps src and public tracked
+# ===================================
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Instrumented libraries
+lib-cov
+
+# Coverage reports
+coverage/
+*.lcov
+.nyc_output
+
+# Build outputs (safe to regenerate)
+dist/
+build/
+.next/
+out/
+.nuxt/
+.vuepress/dist/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+bower_components/
+web_modules/
+
+# Caches
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.fusebox/
+.dynamodb/
+.serverless/
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.*.local
+
+# Editor / Tool files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Yarn / pnpm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# REPL history
+.node_repl_history
+
+# npm pack files
+*.tgz
+
+# ===================================
+# 🔒 KEEP THESE FOLDERS TRACKED
+# ===================================
+!src/
+!public/
+!assets/
+!README.md
+
+# End of .gitignore
