@@ -1,1 +1,1 @@
-export const DB_NAME="UVIEW"
+export const DB_NAME="UVIEW";
