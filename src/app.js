@@ -15,4 +15,9 @@ app.use(express.urlencoded({extended:true,limit:"20kb"}));//to accept data caonn
 app.use(express.static("public"))//to explore data save usch as pdf images
 app.use(cookieParser());
 
+//routes
+import userRouter from "./routes/userRoutes.js";
+
+app.use("/api/v1/users",userRouter);
+
 export {app};
