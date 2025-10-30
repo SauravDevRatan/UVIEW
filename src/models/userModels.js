@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const userSchema=new mongoose.Schema({
@@ -8,7 +8,7 @@ const userSchema=new mongoose.Schema({
     fullName:{type:String,required:true,trim:true,index:true},
     avatar:{type:String,},
     coverImage:{type:String,},
-    password:{type:String,required:[,"password is required"],},
+    password:{type:String,required:[true,"password is required"],},
     watchHistory:
     [{
         type:mongoose.Schema.Types.ObjectId,
@@ -18,7 +18,7 @@ const userSchema=new mongoose.Schema({
 
 userSchema.pre("save",async function(next){
     if(!this.isModified("password")){return next();}
-    this.password=bcrypt.hash(this.password,8);
+    this.password=await bcrypt.hash(this.password,8);
     next()
 })
 
@@ -47,7 +47,7 @@ userSchema.methods.refreshAccessToken=async function(){
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIN:process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn:process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }
