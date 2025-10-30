@@ -18,8 +18,9 @@ if(await User.findOne({$or:[{username},{email}]})){
   };
 
 //check for images from avatar
-const avatarLocalPath=req.files?.avatar?.[0].path;
-const coverImageLocalPath=req.files?.coverImage?.[0].path;
+// console.log("REQ FILES:", req.files);
+const avatarLocalPath=req.files?.avatar?.[0]?.path;
+const coverImageLocalPath=req.files?.coverImage?.[0]?.path;
 if (!avatarLocalPath) {
     throw new ApiError("400","avatar image required")
 }
@@ -27,7 +28,7 @@ if (!avatarLocalPath) {
 const Avatar  =await uploadOnCloudniary(avatarLocalPath);
 const Coverimage=await uploadOnCloudniary(coverImageLocalPath);
 
-if(!Avatar){throw new ApiError("400","avatar image required")}
+if(!Avatar){throw new ApiError("400","avatar url do not exist")}
 //create user object-create entry in db
 const postinguser=new User (
     {
@@ -49,7 +50,7 @@ if (!existingUser) {
 //RETURN RES
 
    return res.status(200).json(
-    ApiResponse(201,existingUser,"user registered successfully")
+    new ApiResponse(201,existingUser,"user registered successfully")
    )
    
 })
