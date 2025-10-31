@@ -8,7 +8,6 @@ const userSchema=new mongoose.Schema({
     fullName:{type:String,required:true,trim:true,index:true},
     avatar:{type:String,required:true},
     coverImage:{type:String,},
-    refreshToken:{tytpe:String},
     password:{type:String,required:[true,"password is required"],},
     watchHistory:
     [{
@@ -34,7 +33,7 @@ userSchema.methods.generateAccessToken=  function(){
         },
         process.env.TOKEN_SECRET,
         {
-            expiresIN:process.env.ACESS_TOKEN_EXPIRY
+            expiresIn:process.env.ACESS_TOKEN_EXPIRY
         }
     )
 }
