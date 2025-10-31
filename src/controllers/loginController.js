@@ -3,6 +3,7 @@ import {User} from "../models/userModels.js";
 import {ApiError} from "../utils/APIerror.js";
 import {ApiResponse }from "../utils/APIresponse.js";
 
+
 const generateAccessTokenAndRefreshToken=async(userID)=>{
     try {
         const user=await User.findById(userID);
@@ -47,4 +48,22 @@ const loginUser=asyncHandeler(async(req,res)=>{
 }
 );
 
-export {loginUser};
+const logoutUser=asyncHandeler(async(req,res)=>{
+    await User.findByIdAndUpdate( req.auth._id,
+        {
+            $set:{
+                refreshToken:undefined
+            }
+        },{new:true}
+    )
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+
+    return res.status(200).clearCookie("accessToken",options).clearCookie("refreshToken",options)
+    .json(
+         new ApiResponse(200,{},"user is logged out"))
+})
+
+export {loginUser,logoutUser};
