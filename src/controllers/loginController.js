@@ -72,23 +72,33 @@ const refreshAccessToken=asyncHandeler(async(req,res)=>{
      if(!incomingRefreshToken){
         throw new ApiError(401,"unauthorized request")
      }
-    const decodedtoken= jwt.verify(token,process.env.REFRESH_TOKEN_SECRET);
-    const user=await User.findById(decodedtoken?._id);
-    if(!user){
-        throw new ApiError(401,"invalid refresh token")
-     }
-     if(incomingRefreshToken!==user?.refreshToken){
-        throw new ApiError(401,"Refresh token is expired or used")
-     }
-     const options={
-        httpOnly:true,
-        secure:true
-     }
-
-    const{accessToken,refreshToken}=await generateAccessTokenAndRefreshToken(user._id);
-
-    return res.status(200)
-    .cookie("refreshToken",refreshToken)
-    .cookie("accessToken",accessToken)
+    try {
+        const decodedtoken= jwt.verify(token,process.env.REFRESH_TOKEN_SECRET);
+        const user=await User.findById(decodedtoken?._id);
+        if(!user){
+            throw new ApiError(401,"invalid refresh token")
+         }
+         if(incomingRefreshToken!==user?.refreshToken){
+            throw new ApiError(401,"Refresh token is expired or used")
+         }
+         const options={
+            httpOnly:true,
+            secure:true
+         }
+    
+        const{accessToken,newRrefreshToken}=await generateAccessTokenAndRefreshToken(user._id);
+    
+        return res.status(200)
+        .cookie("refreshToken",newRrefreshToken,options)
+        .cookie("accessToken",accessToken,options)
+        .json(
+            new ApiResponse(200,
+                {accessToken,refreshToken:newRrefreshToken},
+                "ACCESSS TOKEN REFRESHED SUCCESSFULLY"
+            )
+        )
+    } catch (error) {
+            throw new ApiError(401,error?.message||"Invalid refresh Token")
+    }
 })
-export {loginUser,logoutUser};
+export {loginUser,logoutUser,refreshAccessToken};
