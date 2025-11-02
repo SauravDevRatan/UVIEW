@@ -171,5 +171,73 @@ const updateusercoverImage=asyncHandeler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200, user, "coverpage updated successfully"));
 })
 
+const getUserChannelProfile=asyncHandeler(async(req,res)=>{
+    const {username}=req.params;
+    if (!username?.trim()) {
+        throw new ApiError(404,"USERNAME NOT FOUND");
+    }
+    const channel=await User.aggregate([
+        {
+            $match:{
+                username:username?.toLowerCase() 
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"channel",
+                as:"subscribers"
+            }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"subscriber",
+                as:"subscribedTo"
+            }
+        },
+        {
+            $addFields:{
+                subscribersCount:{
+                    $size:"$subscribers"
+                },
+                channelsSubscripbedToCount:{
+                    $size:"$subscribedTo"
+                },
+                isSubscribed:{
+                    $cond:{
+                        if:{$in:[req.auth?._id,"$subscribers.subscriber"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },
+        {
+            $project:{
+                fullName:1,
+                username:1,
+                subscribersCount:1,
+                channelsSubscripbedToCount:1,
+                isSubscribed:1,
+                avatar:1,
+                coverImage:1,
+                email:1
+            }
+        }
+    ]);
 
-export {loginUser,logoutUser,refreshAccessToken,changePassword,getCurrentuser,updateAccountDetails,updateuserAvatar,updateusercoverImage};
+    console.log(channel);
+
+    if(!channel?.length){
+        throw new ApiError(404,"CHANNEL DOES NOT EXIST")
+    }
+
+    return res.status(200)
+    .json(new ApiResponse(200,channel[0],"USER CHANNEL FETCHED SUCCESSFULLY"))
+})
+
+
+export {getUserChannelProfile,loginUser,logoutUser,refreshAccessToken,changePassword,getCurrentuser,updateAccountDetails,updateuserAvatar,updateusercoverImage};
