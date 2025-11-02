@@ -4,6 +4,7 @@ import {ApiError} from "../utils/APIerror.js";
 import {ApiResponse }from "../utils/APIresponse.js";
 import jwt from "jsonwebtoken";
 import {uploadOnCloudniary} from "../utils/cloudinary.js";
+import mongoose from "mongoose";
 
 
 const generateAccessTokenAndRefreshToken=async(userID)=>{
@@ -239,5 +240,47 @@ const getUserChannelProfile=asyncHandeler(async(req,res)=>{
     .json(new ApiResponse(200,channel[0],"USER CHANNEL FETCHED SUCCESSFULLY"))
 })
 
+const getWatchHistory=asyncHandeler(async(req,res)=>{
+    const user=await User.aggregate([
+        {
+            $match:{
+                _id:new mongoose.Types.ObjectId(req.auth._id)
+            },
+            $lookup:{
+                from:"videos",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner",pipeline:[
+                            {
+                            $project:{
+                                fullName:1,
+                                username:1,
+                                avatar:1
+                            }
+                            }
+                            ]
+                        }
+                    },{
+                        $addFields:{
+                            owner:{
+                                $first:"$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
 
-export {getUserChannelProfile,loginUser,logoutUser,refreshAccessToken,changePassword,getCurrentuser,updateAccountDetails,updateuserAvatar,updateusercoverImage};
+    return res.status(200)
+    .json(new ApiResponse(200,user[0].watchHistory,"watch history fetched successfully"))
+})
+
+export {getWatchHistory,getUserChannelProfile,loginUser,logoutUser,refreshAccessToken,changePassword,getCurrentuser,updateAccountDetails,updateuserAvatar,updateusercoverImage};
